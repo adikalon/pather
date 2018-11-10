@@ -1,0 +1,25 @@
+{
+    "name": "hellpers/pather",
+    "description": "Обработка и форматирование путей, ссылок, имен файлов/папок",
+    "minimum-stability": "dev",
+    "keywords": [
+        "adikalon",
+        "hellpers",
+        "pather"
+    ],
+    "type": "library",
+    "homepage": "https://bitbucket.org/adikaion/pather",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "adikalon",
+            "homepage": "https://bitbucket.org/adikalon/",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Hellpers\\": "src/"
+        }
+    }
+}

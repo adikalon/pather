@@ -33,4 +33,18 @@ echo Pather::strim($string) . PHP_EOL;
 // Заменить тип разделителя пути с windows на unix
 $string = '\path\to\folder';
 echo Pather::upath($string) . PHP_EOL;
+
+// Исключить дублирование слеша
+$string = '/path//to///folder';
+echo Pather::sone($string) . PHP_EOL;
+
+// Развертывание пути
+$string = 'C:\path\to\..\folder';
+$params = [
+    'upath'  => true,  // Разделители в unix стиле (default)
+    'sone'   => true,  // Исключить дублирование слеша (default)
+    'rstrim' => false, // Без разделителя в конце
+    'trim'   => true,  // Применить к строке trim() (default)
+];
+echo Pather::expath($string, $params) . PHP_EOL;
 ```

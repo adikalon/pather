@@ -71,6 +71,9 @@ class Pather
                     $replacement = ['/([^\\\]|^)\\\([^\\\]|$)/ui'];
                 }
                 return self::preplace($arguments[0], $replacement, ['$1/$2']);
+            case $name == 'sone':
+                unset($name);
+                return self::preplace($arguments[0], ['/\/{2,}/ui'], ['/']);
             default:
                 throw new Exception(
                     "Отсутствует метод " . __CLASS__ . "::$name()"
@@ -89,7 +92,6 @@ class Pather
         string $string, array $replacement, array $subject = ['']
     ): string
     {
-        $string = trim($string);
         $string = preg_replace($replacement, $subject, $string);
 
         unset($replacement);
@@ -118,6 +120,77 @@ class Pather
         unset($symbol);
 
         return trim($name);
+    }
+
+    /**
+     * Развернуть путь ОС
+     * @param string $path Путь к ресурсу
+     * @param array $mode Параметры:
+     * 
+     * bool $mode['upath'] - Разделители в unix стиле (default)
+     * 
+     * bool $mode['sone'] - Исключить дублирование слеша (default)
+     * 
+     * bool $mode['rstrim'] - Без разделителя в конце
+     * 
+     * bool $mode['trim'] - Применить к строке trim() (default)
+     * 
+     * @return string Развернутый путь к ресурсу
+     * @throws Exception
+     */
+    public static function expath(string $path, array $mode = []): string
+    {
+        $mode = [
+            'upath'   => (bool)($mode['upath']  ?? true),
+            'sone'    => (bool)($mode['sone']   ?? true),
+            'rstrim'  => (bool)($mode['rstrim'] ?? false),
+            'trim'    => (bool)($mode['trim']   ?? true),
+        ];
+
+        if ($mode['trim']) {
+            $path = trim($path);
+        }
+
+        if ($mode['upath']) {
+            $path = self::upath($path);
+        }
+
+        if ($mode['sone']) {
+            $path = self::sone($path);
+        }
+
+        if ($mode['rstrim']) {
+            $path = self::rstrim($path);
+        }
+
+        unset($mode);
+
+        $parts = explode('/', $path);
+        $npath = [];
+
+        foreach ($parts as $part) {
+            if ($part == '.') {
+                unset($part);
+                continue;
+            } elseif ($part == '..') {
+                if (count($npath) < 2) {
+                    throw new Exception("Некорректный путь: $path");
+                } else {
+                    array_pop($npath);
+                    unset($part);
+                    continue;
+                }
+            } else {
+                $npath[] = $part;
+            }
+            unset($part);
+        }
+
+        unset($path, $parts);
+
+        $npath = implode('/', $npath);
+
+        return $npath;
     }
 
 }
